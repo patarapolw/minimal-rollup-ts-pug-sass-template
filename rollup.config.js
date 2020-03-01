@@ -25,10 +25,12 @@ export default {
     sourcemap: !process.env.ELECTRON
   },
   watch: {
-    chokidar: {
-      usePolling: true,
-      paths: 'src/**'
-    }
+    chokidar: true,
+    include: [
+      'src/**',
+      'src/index.pug',
+      'public/**'
+    ]
   },
   plugins: [
     del({
@@ -50,18 +52,10 @@ export default {
           })
           .join('\n')
 
-        const links = (files.css || [])
-          .map(({ fileName }) => {
-            const attrs = html.makeHtmlAttributes(attributes.link)
-            return `<link href="${publicPath}${fileName}" rel="stylesheet"${attrs}>`
-          })
-          .join('\n')
-
         return pug.compileFile('src/index.pug')({
           description: pkg.description,
           title: pkg.name,
-          scripts,
-          links
+          scripts
         })
       }
     }),
