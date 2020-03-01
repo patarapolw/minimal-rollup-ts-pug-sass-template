@@ -1,0 +1,29 @@
+doctype html
+html
+  head
+    meta(http-equiv="Content-Type", content="text/html;charset=UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
+    meta(name="description", content=description data-meta="description")
+    meta(name="keywords", content=keywords data-meta="keywords")
+
+    meta(property="og:title" content=title data-meta="title")
+    meta(property="og:description" content=description data-meta="description")
+    meta(property="og:image" content=image data-meta="image")
+    meta(property="og:url" content=url data-meta="url")
+
+    meta(property="twitter:title" content=title data-meta="title")
+    meta(property="twitter:description" content=description data-meta="description")
+    meta(property="twitter:image" content=image data-meta="image")
+    meta(property="twitter:card" content="summary_large_image")
+
+    link(rel="shortcut icon", href=`${favicon || 'favicon.ico'}`, type="image/x-icon")
+
+    | !{links}
+
+    title(data-title=title data-meta="title") #{title}
+  body
+    h1
+      small MinimalJS + Rollup + TypeScript + Pug + SASS
+    
+    | !{scripts}

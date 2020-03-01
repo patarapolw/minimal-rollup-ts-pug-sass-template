@@ -1,0 +1,43 @@
+{
+  "name": "minimal-rollup-ts-pug-sass-template",
+  "version": "0.1.0",
+  "description": "Rollup + TypeScript + Pug + SASS template with no plan for JavaScript frameworks, whatsoever",
+  "private": true,
+  "author": "Pacharapol Withayasakpunt <patarapolw@gmail.com> (https://polvcode.dev)",
+  "license": "MIT",
+  "scripts": {
+    "start": "yarn dev",
+    "dev": "cross-env SERVE=1 rollup -c -w",
+    "watch": "rollup -c -w",
+    "build": "cross-env NODE_ENV=production rollup -c",
+    "watch:electron": "cross-env ELECTRON=1 rollup -c -w",
+    "build:electron": "cross-env NODE_ENV=production ELECTRON=1 rollup -c"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-html": "^0.1.1",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "@rollup/plugin-typescript": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.21.0",
+    "@typescript-eslint/parser": "^2.21.0",
+    "cross-env": "^7.0.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "pug": "^2.0.4",
+    "rollup": "^1.32.0",
+    "rollup-plugin-copy": "^3.3.0",
+    "rollup-plugin-delete": "^1.2.0",
+    "rollup-plugin-livereload": "^1.0.4",
+    "rollup-plugin-scss": "^2.1.0",
+    "rollup-plugin-serve": "^1.0.1",
+    "rollup-plugin-terser": "^5.2.0",
+    "rollup-plugin-ts-paths": "^1.0.4",
+    "sass": "^1.26.2",
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
+  }
+}
