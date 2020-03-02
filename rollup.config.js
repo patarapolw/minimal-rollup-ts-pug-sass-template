@@ -1,6 +1,7 @@
 import path from 'path'
 
 import pug from 'pug'
+import dotenv from 'dotenv'
 
 import typescript from '@rollup/plugin-typescript'
 import scss from 'rollup-plugin-scss'
@@ -12,10 +13,13 @@ import del from 'rollup-plugin-delete'
 import livereload from 'rollup-plugin-livereload'
 import serve from 'rollup-plugin-serve'
 import html from '@rollup/plugin-html'
+import pugPlugin from 'rollup-plugin-pug'
+import replace from '@rollup/plugin-replace'
 
 import pkg from './package.json'
+dotenv.config()
 
-const outDir = 'dist'
+const outDir = process.env.OUT_DIR || 'dist'
 
 export default {
   input: 'src/index.ts',
@@ -37,10 +41,14 @@ export default {
       targets: path.join(outDir, '*'),
       runOnce: true
     }),
+    replace({
+      __routerMode__: process.env.ROUTER_MODE
+    }),
     typescript(),
     scss({
       output: path.resolve(outDir, 'bundle.css')
     }),
+    pugPlugin(),
     commonjs(),
     resolve(),
     html({
@@ -59,15 +67,19 @@ export default {
         })
       }
     }),
-    copy({
-      targets: [
-        { src: 'public/**/*', dest: outDir }
-      ]
-    }),
     ...(process.env.SERVE ? [
-      serve(outDir),
+      serve({
+        contentBase: [outDir, 'public'],
+        historyApiFallback: '/'
+      }),
       livereload(outDir)
-    ] : []),
+    ] : [
+      copy({
+        targets: [
+          { src: 'public/**/*', dest: outDir }
+        ]
+      })
+    ]),
     ...(process.env.NODE_ENV === 'production' ? [
       terser()
     ] : [])
