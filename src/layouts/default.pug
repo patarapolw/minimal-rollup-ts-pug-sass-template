@@ -1,0 +1,34 @@
+link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css")
+script(defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js")
+
+nav.navbar.is-fixed-top.has-shadow(role="navigation" aria-label="main navigation")
+  .navbar-brand
+    a.navbar-item(is="router-link" to="/")
+      strong LOGO
+
+    a.navbar-burger.burger(role="button" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample")
+      span(aria-hidden="true")
+      span(aria-hidden="true")
+      span(aria-hidden="true")
+  
+  .navbar-menu#navbarBasicExample
+    .navbar-start
+      a.navbar-item(is="router-link" to="/") Home
+      a.navbar-item(is="router-link" to="/documentation") Documentation
+      a.navbar-item(is="router-link" to="/not-exists") Non-existent Route
+      
+      .navbar-item.has-dropdown.is-hoverable
+        a.navbar-link More
+        .navbar-dropdown
+          a.navbar-item(href="https://github.com/patarapolw/minimal-rollup-ts-pug-sass-template") About
+          hr.navbar-divider
+          a.navbar-item(href="https://github.com/patarapolw/minimal-rollup-ts-pug-sass-template/issues") Report an issue
+    
+    .navbar-end
+      .navbar-item
+        .buttons
+          a.button.is-primary
+            strong Sign up
+          a.button.is-light Log in
+
+main(style="padding-top: 3.25rem;") !{routerView}

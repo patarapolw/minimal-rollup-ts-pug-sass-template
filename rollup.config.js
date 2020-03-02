@@ -1,6 +1,8 @@
+import fs from 'fs'
 import path from 'path'
 
 import pug from 'pug'
+import dotenv from 'dotenv'
 
 import typescript from '@rollup/plugin-typescript'
 import scss from 'rollup-plugin-scss'
@@ -11,19 +13,28 @@ import copy from 'rollup-plugin-copy'
 import del from 'rollup-plugin-delete'
 import livereload from 'rollup-plugin-livereload'
 import serve from 'rollup-plugin-serve'
-import html from '@rollup/plugin-html'
+import pugPlugin from 'rollup-plugin-pug'
+import replace from '@rollup/plugin-replace'
 
 import pkg from './package.json'
+dotenv.config()
 
-const outDir = 'dist'
+const outDir = process.env.OUT_DIR || 'dist'
 
 export default {
   input: 'src/index.ts',
-  output: {
-    file: path.resolve(outDir, 'bundle.js'),
-    format: 'iife',
-    sourcemap: !process.env.ELECTRON
-  },
+  output: [
+    {
+      dir: path.resolve(outDir, 'module'),
+      format: 'esm',
+      sourcemap: !process.env.ELECTRON
+    },
+    {
+      dir: path.join(outDir, 'nomodule'),
+      format: 'system',
+      sourcemap: true
+    }
+  ],
   watch: {
     chokidar: true,
     include: [
@@ -37,35 +48,35 @@ export default {
       targets: path.join(outDir, '*'),
       runOnce: true
     }),
+    replace({
+      __routerMode__: process.env.ROUTER_MODE
+    }),
     typescript(),
     scss({
       output: path.resolve(outDir, 'bundle.css')
     }),
+    pugPlugin(),
     commonjs(),
     resolve(),
-    html({
-      template: ({ attributes, files, publicPath }) => {
-        const scripts = (files.js || [])
-          .map(({ fileName }) => {
-            const attrs = html.makeHtmlAttributes(attributes.script)
-            return `<script src="${publicPath}${fileName}"${attrs}></script>`
-          })
-          .join('\n')
-
-        return pug.compileFile('src/index.pug')({
+    {
+      name: 'emitPug',
+      generateBundle () {
+        fs.writeFileSync(path.join(outDir, 'index.html'), pug.compileFile('src/index.pug')({
           description: pkg.description,
-          title: pkg.name,
-          scripts
-        })
+          title: pkg.name
+        }))
       }
-    }),
+    },
     copy({
       targets: [
         { src: 'public/**/*', dest: outDir }
       ]
     }),
     ...(process.env.SERVE ? [
-      serve(outDir),
+      serve({
+        contentBase: outDir,
+        historyApiFallback: '/'
+      }),
       livereload(outDir)
     ] : []),
     ...(process.env.NODE_ENV === 'production' ? [

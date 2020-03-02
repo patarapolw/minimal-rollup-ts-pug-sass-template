@@ -20,9 +20,9 @@ html
     link(rel="shortcut icon", href=`${favicon || 'favicon.ico'}`, type="image/x-icon")
     link(rel="stylesheet", href="bundle.css")
 
-    title(data-title=title data-meta="title") #{title}
+    title(data-title=title data-meta="title")= title
   body
-    h1
-      small MinimalJS + Rollup + TypeScript + Pug + SASS
+    #App
     
-    | !{scripts}
+    script(src="module/index.js" type="module")
+    script(src="nomodule/index.js" nomodule)
