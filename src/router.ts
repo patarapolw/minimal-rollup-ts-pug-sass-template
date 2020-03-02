@@ -1,3 +1,7 @@
+const evSpaRendered = (to: string) => new CustomEvent('spa-rendered', { detail: { to } })
+
+// window.addEventListener('spa-rendered', console.log)
+
 export const ROUTER_MODE = '__routerMode__' as string
 
 export function parseUrl (mode = ROUTER_MODE) {
@@ -113,14 +117,13 @@ export class AppRouter extends HTMLElement {
   }
 
   async attachView (evt?: any) {
-    console.log(evt)
-
     const path = ((evt && evt.state) ? evt.state.to : '') || parseUrl().path
     for (const r of this.routes) {
       if (Array.isArray(r.path) ? r.path.includes(path) : path === r.path) {
         this.innerHTML = await (r.layout || layouts.default)({
           routerView: await r.view()
         })
+        window.dispatchEvent(evSpaRendered(path))
         return
       }
     }
@@ -129,6 +132,7 @@ export class AppRouter extends HTMLElement {
     this.innerHTML = await (r.layout || layouts.default)({
       routerView: await r.view()
     })
+    window.dispatchEvent(evSpaRendered(path))
   }
 }
 
