@@ -120,22 +120,24 @@ export class AppRouter extends HTMLElement {
     const path = ((evt && evt.state) ? evt.state.to : '') || parseUrl().path
 
     if (path !== document.body.getAttribute('data-spa-rendered')) {
-      for (const r of this.routes) {
-        if (Array.isArray(r.path) ? r.path.includes(path) : path === r.path) {
-          this.innerHTML = await (r.layout || layouts.default)({
-            routerView: await r.view()
-          })
-          window.dispatchEvent(evSpaRendered(path))
-          document.body.setAttribute('data-spa-rendered', path)
-          return
+      await (async () => {
+        for (const r of this.routes) {
+          if (Array.isArray(r.path) ? r.path.includes(path) : path === r.path) {
+            this.innerHTML = await (r.layout || layouts.default)({
+              routerView: await r.view()
+            })
+            return
+          }
         }
-      }
 
-      const r = this.default_
-      this.innerHTML = await (r.layout || layouts.default)({
-        routerView: await r.view()
-      })
+        const r = this.default_
+        this.innerHTML = await (r.layout || layouts.default)({
+          routerView: await r.view()
+        })
+      })().catch(e => { throw e })
+
       window.dispatchEvent(evSpaRendered(path))
+      document.body.setAttribute('data-spa-rendered', path)
     }
   }
 }
@@ -163,8 +165,7 @@ class RouterLink extends HTMLAnchorElement {
 customElements.define('router-link', RouterLink, { extends: 'a' })
 
 export function navigateTo (to: string) {
-  document.body.removeAttribute('data-spa-rendered')
-
+  // document.body.removeAttribute('data-spa-rendered')
   if (ROUTER_MODE === 'history') {
     history.pushState({ to }, '', to)
     window.dispatchEvent(new PopStateEvent('popstate', { state: { to } }))
