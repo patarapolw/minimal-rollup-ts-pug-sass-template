@@ -1,10 +1,3 @@
-import defaultLayout from './layouts/default.pug'
-import blankLayout from './layouts/blank.pug'
-
-import v404 from './views/404.pug'
-import vDocumentation from './views/documentation.pug'
-import vHome from './views/home.pug'
-
 export const ROUTER_MODE = '__routerMode__' as string
 
 export function parseUrl (mode = ROUTER_MODE) {
@@ -72,24 +65,33 @@ export interface IRoute {
   layout?: (ctx: { routerView: string }) => string | Promise<string>
 }
 
+export const layouts = {
+  async default (ctx: { routerView: string }) {
+    return import('./layouts/default.pug').then(r => r.default(ctx))
+  },
+  async blank (ctx: { routerView: string }) {
+    return import('./layouts/blank.pug').then(r => r.default(ctx))
+  }
+}
+
 export class AppRouter extends HTMLElement {
   routes: IRoute[] = [
     {
       path: '/documentation',
-      view: vDocumentation
+      view: () => import('./views/documentation.pug').then(r => r.default())
     },
     {
       path: [
         '/',
         ''
       ],
-      view: vHome
+      view: () => import('./views/home.pug').then(r => r.default())
     }
   ]
 
   default_: Omit<IRoute, 'path'> = {
-    view: v404,
-    layout: blankLayout
+    view: () => import('./views/404.pug').then(r => r.default()),
+    layout: layouts.blank
   }
 
   connectedCallback () {
@@ -116,7 +118,7 @@ export class AppRouter extends HTMLElement {
     const path = ((evt && evt.state) ? evt.state.to : '') || parseUrl().path
     for (const r of this.routes) {
       if (Array.isArray(r.path) ? r.path.includes(path) : path === r.path) {
-        this.innerHTML = await (r.layout || defaultLayout)({
+        this.innerHTML = await (r.layout || layouts.default)({
           routerView: await r.view()
         })
         return
@@ -124,7 +126,7 @@ export class AppRouter extends HTMLElement {
     }
 
     const r = this.default_
-    this.innerHTML = await (r.layout || defaultLayout)({
+    this.innerHTML = await (r.layout || layouts.default)({
       routerView: await r.view()
     })
   }
